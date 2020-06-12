@@ -34,5 +34,13 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClassName = 'com.hdmr1234.jlox.Lox'
+    mainClassName = 'com.hdmr1234.jlox.AstPrinter'
+}
+
+task runGenerateAst(type: JavaExec) {
+    group = "Execution"
+    description = "Generate file Expr"
+    classpath = sourceSets.main.runtimeClasspath
+    main = "com.hdmr1234.tool.GenerateAst"
+    args './src/main/java/com/hdmr1234/jlox'
 }
