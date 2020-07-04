@@ -5,11 +5,21 @@ import java.util.List;
 import static com.hdmr1234.jlox.TokenType.*;
 
 public class Parser {
+    private static class ParseError extends RuntimeException {}
+
     private final List<Token> tokens;
     private int current = 0;
 
     Parser(List<Token> tokens) {
         this.tokens = tokens;
+    }
+
+    Expr parse() {
+        try {
+            return expression();
+        } catch (ParseError error) {
+            return null;
+        }
     }
 
     private Expr expression() {
@@ -20,7 +30,7 @@ public class Parser {
         Expr expr = comparison();
 
         while (match(BANG_EQUAL, EQUAL_EQUAL)) {
-            Token openrator = previous();
+            Token operator = previous();
             Expr right = comparison();
             expr = new Expr.Binary(expr, operator, right);
         }
@@ -38,6 +48,12 @@ public class Parser {
         return false;
     }
 
+    private Token consume(TokenType type, String message) {
+        if (check(type)) return advance();
+
+        throw error(peek(), message);
+    }
+
     private boolean check(TokenType type) {
         if (isAtEnd())
             return false;
@@ -46,7 +62,7 @@ public class Parser {
 
     private Token advance() {
         if (!isAtEnd())
-            currnet++;
+            current++;
         return previous();
     }
 
@@ -62,6 +78,33 @@ public class Parser {
         return tokens.get(current - 1);
     }
 
+    private ParseError error(Token token, String message) {
+        Lox.error(token, message);
+        return new ParseError();
+    }
+
+    private void synchronize() {
+        advance();
+
+        while (!isAtEnd()) {
+            if (previous().type == SEMICOLON) return;
+
+            switch (peek().type) {
+                case CLASS:
+                case FUN:
+                case VAR:
+                case FOR:
+                case IF:
+                case WHILE:
+                case PRINT:
+                case RETURN:
+                    return;
+            }
+
+            advance();
+        }
+    }
+
     private Expr comparison() {
         Expr expr = addition();
 
@@ -75,12 +118,12 @@ public class Parser {
     }
 
     private Expr addition() {
-        Expr expr = multiplication()
+        Expr expr = multiplication();
 
         while (match(MINUS, PLUS)) {
             Token operator = previous();
 
-            Expr right = multiplication()
+            Expr right = multiplication();
             expr = new Expr.Binary(expr, operator, right);
         }
 
@@ -126,5 +169,7 @@ public class Parser {
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);
         }
+
+        throw error(peek(), "Expect expression.");
     }
 }
