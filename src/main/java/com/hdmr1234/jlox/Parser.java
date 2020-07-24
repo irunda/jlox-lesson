@@ -3,8 +3,6 @@ package com.hdmr1234.jlox;
 import java.util.ArrayList;
 import java.util.List;
 
-import jdk.nashorn.internal.ir.ExpressionStatement;
-
 import static com.hdmr1234.jlox.TokenType.*;
 
 public class Parser {
@@ -27,7 +25,7 @@ public class Parser {
     }
 
     private Expr expression() {
-        return equality();
+        return assignment();
     }
 
     private Stmt declaration() {
@@ -44,7 +42,7 @@ public class Parser {
     private Stmt statement() {
         if (match(PRINT)) return printStatemanet();
 
-        return ExpressionStatement();
+        return expressionStatement();
     }
 
     private Stmt printStatemanet() {
@@ -53,11 +51,17 @@ public class Parser {
         return new Stmt.Print(value);
     }
 
+    private Stmt expressionStatement() {
+        Expr expr = expression();
+        consume(SEMICOLON, "Expect ';' after expression.");
+        return new Stmt.Expression(expr);
+    }
+
     private Stmt varDeclaration() {
         Token name = consume(IDENTIFIER, "Expect variable name.");
 
         Expr initializer = null;
-        if(mtch(EQUAL)) {
+        if(match(EQUAL)) {
             initializer = expression();
         }
 
@@ -65,10 +69,22 @@ public class Parser {
         return new Stmt.Var(name, initializer);
     }
 
-    private Stmt expressionStatement() {
-        Expr expr = expression();
-        consume(SEMICOLON, "Expect ';' after expression.");
-        return new Stmt.Expression();
+    private Expr assignment() {
+        Expr expr = equality();
+
+        if(match(EQUAL)) {
+            Token equals = previous();
+            Expr value = assignment();
+
+            if (expr instanceof Expr.Variable) {
+                Token name = ((Expr.Variable)expr).name;
+                return new Expr.Assign(name, value);
+            }
+
+            error(equals, "Invalid assignment target");
+        }
+
+        return expr;
     }
 
     private Expr equality() {
