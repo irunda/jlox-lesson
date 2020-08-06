@@ -25,6 +25,7 @@ public class Parser {
     }
 
     private Expr expression() {
+        // return equality();
         return assignment();
     }
 

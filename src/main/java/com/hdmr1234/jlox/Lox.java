@@ -78,6 +78,7 @@ public class Lox {
     private static void report(int line, String where, String message) {
         System.err.println("[line " + line + "] Error" + where + ": " + message);
         // return new ParseError(); hadError = true; }
+    }
 
     static void error(Token token, String message) {
         if (token.type == TokenType.EOF) {
