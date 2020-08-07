@@ -1,29 +1,29 @@
 package com.hdmr1234.jlox;
 import java.util.List;
 
-public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
+public class Interpreter implements Expr.Visitor<Object> {
+// public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
-    private Environment environment = new Environment();
+    // private Environment environment = new Environment();
 
-    // void interpret(Expression statements) {
+    void interpret(Expr expression) {
+        try {
+            Object value = evaluate(expression);
+            System.out.println(stringify(value));
+        } catch (RuntimeError error) {
+            Lox.runtimeError(error);
+        }
+    }
+
+    // void interpret(List<Stmt> statements) {
     //     try {
-    //             Object value = evaluate(expression);
-    //             System.out.println(stringify(value));
+    //         for (Stmt statement : statements) {
+    //             execute(statement);
     //         }
     //     } catch (RuntimeError error) {
     //         Lox.runtimeError(error);
     //     }
     // }
-
-    void interpret(List<Stmt> statements) {
-        try {
-            for (Stmt statement : statements) {
-                execute(statement);
-            }
-        } catch (RuntimeError error) {
-            Lox.runtimeError(error);
-        }
-    }
 
     @Override
     public Object visitLiteralExpr(Expr.Literal expr) {
@@ -39,57 +39,57 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return expr.accept(this);
     }
 
-    private void execute(Stmt stmt) {
-        stmt.accept(this);
-    }
+    // private void execute(Stmt stmt) {
+    //     stmt.accept(this);
+    // }
 
-    void executeBlock(List<Stmt> statements, Environment environment) {
-        Environment previous = this.environment;
-        try {
-            this.environment = environment;
-            for (Stmt statement : statements) {
-                execute(statement);
-            }
-        } finally {
-            this.environment = previous;
-        }
-    }
+    // void executeBlock(List<Stmt> statements, Environment environment) {
+    //     Environment previous = this.environment;
+    //     try {
+    //         this.environment = environment;
+    //         for (Stmt statement : statements) {
+    //             execute(statement);
+    //         }
+    //     } finally {
+    //         this.environment = previous;
+    //     }
+    // }
 
-    @Override
-    public Void visitBlockStmt(Stmt.Block stmt) {
-        executeBlock(stmt.statements, new Environment());
-        return null;
-    }
+    // @Override
+    // public Void visitBlockStmt(Stmt.Block stmt) {
+    //     executeBlock(stmt.statements, new Environment());
+    //     return null;
+    // }
 
-    @Override
-    public Void visitExpressionStmt(Stmt.Expression stmt) {
-        evaluate(stmt.expression);
-        return null;
-    }
+    // @Override
+    // public Void visitExpressionStmt(Stmt.Expression stmt) {
+    //     evaluate(stmt.expression);
+    //     return null;
+    // }
 
-    @Override
-    public Void visitPrintStmt(Stmt.Print stmt) {
-        Object value = evaluate(stmt.expression);
-        System.out.println(stringify(value));
-        return null;
-    }
+    // @Override
+    // public Void visitPrintStmt(Stmt.Print stmt) {
+    //     Object value = evaluate(stmt.expression);
+    //     System.out.println(stringify(value));
+    //     return null;
+    // }
 
-    @Override
-    public Void visitVarStmt(Stmt.Var stmt) {
-        Object value = null;
-        if (stmt.initializer != null) {
-            value = evaluate(stmt.initializer);
-        }
-        environment.define(stmt.name.lexeme, value);
-        return null;
-    }
+    // @Override
+    // public Void visitVarStmt(Stmt.Var stmt) {
+    //     Object value = null;
+    //     if (stmt.initializer != null) {
+    //         value = evaluate(stmt.initializer);
+    //     }
+    //     environment.define(stmt.name.lexeme, value);
+    //     return null;
+    // }
 
-    @Override
-    public Object visitAssignExpr(Expr.Assign expr) {
-        Object value = evaluate(expr.value);
-        environment.assign(expr.name, value);
-        return value;
-    }
+    // @Override
+    // public Object visitAssignExpr(Expr.Assign expr) {
+    //     Object value = evaluate(expr.value);
+    //     environment.assign(expr.name, value);
+    //     return value;
+    // }
 
     @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
@@ -156,10 +156,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
-    @Override
-    public Object visitVariableExpr(Expr.Variable expr) {
-        return environment.get(expr.name);
-    }
+    // @Override
+    // public Object visitVariableExpr(Expr.Variable expr) {
+    //     return environment.get(expr.name);
+    // }
 
     private void checkNumberOperand(Token operator, Object operand) {
         if (operand instanceof Double)

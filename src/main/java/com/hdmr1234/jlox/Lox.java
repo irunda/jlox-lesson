@@ -39,7 +39,7 @@ public class Lox {
 
         for (;;) {
             System.out.print(">");
-            Strin line = reader.readLine();
+            String line = reader.readLine();
             if(line == null) break;
             run(line);
             hadError = false;
@@ -57,7 +57,8 @@ public class Lox {
         // }
 
         Parser parser = new Parser(tokens);
-        List<Stmt> expression = parser.parse();
+        Expr expression = parser.parse();
+        // List<Stmt> expression = parser.parse();
 
         if (hadError) return;
 

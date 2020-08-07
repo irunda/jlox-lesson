@@ -15,78 +15,86 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    List<Stmt> parse() {
-        List<Stmt> statements = new ArrayList<>();
-        while(!isAtEnd()) {
-            statements.add(declaration());
-        }
-
-        return statements;
-    }
-
-    private Expr expression() {
-        // return equality();
-        return assignment();
-    }
-
-    private Stmt declaration() {
+    Expr parse() {
         try {
-            if(match(VAR)) return varDeclaration();
-
-            return statement();
+            return expression();
         } catch (ParseError error) {
-            synchronize();
             return null;
         }
     }
 
-    private Stmt statement() {
-        if (match(PRINT)) return printStatemanet();
+    // List<Stmt> parse() {
+    //     List<Stmt> statements = new ArrayList<>();
+    //     while(!isAtEnd()) {
+    //         statements.add(declaration());
+    //     }
 
-        return expressionStatement();
+    //     return statements;
+    // }
+
+    private Expr expression() {
+        return equality();
+        // return assignment();
     }
 
-    private Stmt printStatemanet() {
-        Expr value = expression();
-        consume(SEMICOLON, "Expect ';' after value.");
-        return new Stmt.Print(value);
-    }
+    // private Stmt declaration() {
+    //     try {
+    //         if(match(VAR)) return varDeclaration();
 
-    private Stmt expressionStatement() {
-        Expr expr = expression();
-        consume(SEMICOLON, "Expect ';' after expression.");
-        return new Stmt.Expression(expr);
-    }
+    //         return statement();
+    //     } catch (ParseError error) {
+    //         synchronize();
+    //         return null;
+    //     }
+    // }
 
-    private Stmt varDeclaration() {
-        Token name = consume(IDENTIFIER, "Expect variable name.");
+    // private Stmt statement() {
+    //     if (match(PRINT)) return printStatemanet();
 
-        Expr initializer = null;
-        if(match(EQUAL)) {
-            initializer = expression();
-        }
+    //     return expressionStatement();
+    // }
 
-        consume(SEMICOLON, "Expect ';' after variable declaration.");
-        return new Stmt.Var(name, initializer);
-    }
+    // private Stmt printStatemanet() {
+    //     Expr value = expression();
+    //     consume(SEMICOLON, "Expect ';' after value.");
+    //     return new Stmt.Print(value);
+    // }
 
-    private Expr assignment() {
-        Expr expr = equality();
+    // private Stmt expressionStatement() {
+    //     Expr expr = expression();
+    //     consume(SEMICOLON, "Expect ';' after expression.");
+    //     return new Stmt.Expression(expr);
+    // }
 
-        if(match(EQUAL)) {
-            Token equals = previous();
-            Expr value = assignment();
+    // private Stmt varDeclaration() {
+    //     Token name = consume(IDENTIFIER, "Expect variable name.");
 
-            if (expr instanceof Expr.Variable) {
-                Token name = ((Expr.Variable)expr).name;
-                return new Expr.Assign(name, value);
-            }
+    //     Expr initializer = null;
+    //     if(match(EQUAL)) {
+    //         initializer = expression();
+    //     }
 
-            error(equals, "Invalid assignment target");
-        }
+    //     consume(SEMICOLON, "Expect ';' after variable declaration.");
+    //     return new Stmt.Var(name, initializer);
+    // }
 
-        return expr;
-    }
+    // private Expr assignment() {
+    //     Expr expr = equality();
+
+    //     if(match(EQUAL)) {
+    //         Token equals = previous();
+    //         Expr value = assignment();
+
+    //         if (expr instanceof Expr.Variable) {
+    //             Token name = ((Expr.Variable)expr).name;
+    //             return new Expr.Assign(name, value);
+    //         }
+
+    //         error(equals, "Invalid assignment target");
+    //     }
+
+    //     return expr;
+    // }
 
     private Expr equality() {
         Expr expr = comparison();
@@ -226,9 +234,9 @@ public class Parser {
             return new Expr.Literal(previous().literal);
         }
 
-        if (match(IDENTIFIER)) {
-            return new Expr.Variable(previous());
-        }
+    //     if (match(IDENTIFIER)) {
+    //         return new Expr.Variable(previous());
+    //     }
 
         if (match(LEFT_PAREN)) {
             Expr expr = expression();
