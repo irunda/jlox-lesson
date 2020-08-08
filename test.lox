@@ -21,3 +21,12 @@ var c = "global c";
 print a;
 print b;
 print c;
+
+var aa = 0;
+var bb = 1;
+while (aa < 10000) {
+  print aa;
+  var temp = aa;
+  aa = bb;
+  bb = temp + bb;
+}
