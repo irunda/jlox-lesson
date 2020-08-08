@@ -37,6 +37,14 @@ application {
     mainClassName = 'com.hdmr1234.jlox.Lox'
 }
 
+task runFile(type: JavaExec) {
+    group = "Execution"
+    description = "compile lox file"
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.hdmr1234.jlox.Lox'
+    args './test.lox'
+}
+
 task runGenerateAst(type: JavaExec) {
     group = "Execution"
     description = "Generate file Expr"
