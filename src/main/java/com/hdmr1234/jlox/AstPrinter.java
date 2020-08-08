@@ -6,14 +6,19 @@ package com.hdmr1234.jlox;
      }
 
      @Override
+     public String visitAssignExpr(Expr.Assign expr) {
+         return parenthesize("=", expr.value);
+     }
+
+     @Override
      public String visitBinaryExpr(Expr.Binary expr) {
          return parenthesize(expr.operator.lexeme, expr.left, expr.right);
      }
 
-//     @Override
-//     public String visitVariableExpr(Expr.Variable expr) {
-//         return expr.name.lexeme;
-//      }
+    @Override
+    public String visitVariableExpr(Expr.Variable expr) {
+        return expr.name.lexeme;
+     }
 
      @Override
      public String visitGroupingExpr(Expr.Grouping expr) {

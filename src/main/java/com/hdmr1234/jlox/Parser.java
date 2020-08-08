@@ -34,8 +34,8 @@ public class Parser {
     }
 
     private Expr expression() {
-        return equality();
-        // return assignment();
+        // return equality();
+        return assignment();
     }
 
     private Stmt declaration() {
@@ -51,6 +51,7 @@ public class Parser {
 
     private Stmt statement() {
         if (match(PRINT)) return printStatemanet();
+        if (match(LEFT_BRACE)) return new Stmt.Block(block());
 
         return expressionStatement();
     }
@@ -67,6 +68,17 @@ public class Parser {
         return new Stmt.Expression(expr);
     }
 
+    private List<Stmt> block() {
+        List<Stmt> statements = new ArrayList<>();
+
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            statements.add(declaration());
+        }
+
+        consume(RIGHT_BRACE, "Expect '}' after block.");
+        return statements;
+    }
+
     private Stmt varDeclaration() {
         Token name = consume(IDENTIFIER, "Expect variable name.");
 
@@ -79,23 +91,23 @@ public class Parser {
         return new Stmt.Var(name, initializer);
     }
 
-    // private Expr assignment() {
-    //     Expr expr = equality();
+    private Expr assignment() {
+        Expr expr = equality();
 
-    //     if(match(EQUAL)) {
-    //         Token equals = previous();
-    //         Expr value = assignment();
+        if(match(EQUAL)) {
+            Token equals = previous();
+            Expr value = assignment();
 
-    //         if (expr instanceof Expr.Variable) {
-    //             Token name = ((Expr.Variable)expr).name;
-    //             return new Expr.Assign(name, value);
-    //         }
+            if (expr instanceof Expr.Variable) {
+                Token name = ((Expr.Variable)expr).name;
+                return new Expr.Assign(name, value);
+            }
 
-    //         error(equals, "Invalid assignment target");
-    //     }
+            error(equals, "Invalid assignment target");
+        }
 
-    //     return expr;
-    // }
+        return expr;
+    }
 
     private Expr equality() {
         Expr expr = comparison();
